@@ -423,3 +423,12 @@ Examples of metrics extracted when present:
 - `swebench_resolve_rate`
 
 These metrics are passed through the existing MLflow logging path, so evaluation quality is visible in MLflow instead of only in the raw SWE-bench report.
+
+## UI Evidence
+
+UI screenshots are included under:
+
+screenshots/
+
+- `airflow_dag_success.png`: successful `evaluate_agent` DAG run in Airflow showing all tasks completed successfully.
+- `mlflow_metrics.png`: MLflow run `batch_screenshot_001` showing logged pipeline metrics and SWE-bench evaluation metrics, including `swebench_resolved_instances = 1` and `swebench_resolve_rate = 1`.
