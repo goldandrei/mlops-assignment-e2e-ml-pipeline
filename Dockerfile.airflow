@@ -1,0 +1,22 @@
+FROM python:3.12-slim
+
+ENV PATH="/root/.local/bin:${PATH}"
+ENV AIRFLOW_HOME=/airflow
+ENV AIRFLOW__CORE__LOAD_EXAMPLES=false
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        curl \
+        ca-certificates \
+        docker.io \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh
+
+WORKDIR /project
+
+COPY pyproject.toml uv.lock* ./
+
+RUN uv sync
+
+CMD ["sh", "-lc", "echo '{\"admin\": \"admin\"}' > /airflow/simple_auth_manager_passwords.json.generated && uv tool run --with mlflow apache-airflow standalone"]

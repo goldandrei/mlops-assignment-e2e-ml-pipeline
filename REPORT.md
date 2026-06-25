@@ -367,3 +367,18 @@ Single-instance ad-hoc agent execution can be useful for local debugging, but th
 runs/RUN_ID/run-agent/trajectories/preds.json
 
 Batch mode produces this file directly, so the Airflow DAG restricts the submitted evaluation flow to batch mode. This avoids a misleading configuration where the agent runs but evaluation is skipped because preds.json does not exist.
+
+## Airflow Image Improvement
+
+The compose deployment uses a dedicated `Dockerfile.airflow`.
+
+This avoids installing system packages, Docker CLI, curl, and uv on every `docker compose up`.
+
+The Airflow service now builds a reusable image with:
+
+- Python 3.12
+- uv
+- project dependencies
+- Docker CLI for SWE-bench harness container execution
+
+This makes the compose setup faster and more reproducible than installing dependencies at container startup.
