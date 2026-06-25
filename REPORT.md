@@ -24,7 +24,7 @@ prepare_run -> run_agent -> run_eval -> summarize_and_log
 
 Creates a reproducible run directory:
 
-runs/<run_id>/
+runs/RUN_ID/
 
 and writes:
 
@@ -45,7 +45,7 @@ For the completed evaluation run, batch mode was used.
 
 The agent writes artifacts under:
 
-runs/<run_id>/run-agent/
+runs/RUN_ID/run-agent/
 
 Important outputs include:
 
@@ -64,11 +64,11 @@ uv run python -m swebench.harness.run_evaluation
 
 The evaluation reads:
 
-runs/<run_id>/run-agent/trajectories/preds.json
+runs/RUN_ID/run-agent/trajectories/preds.json
 
 and writes logs and reports under:
 
-runs/<run_id>/run-eval/
+runs/RUN_ID/run-eval/
 
 ### summarize_and_log
 
@@ -142,7 +142,7 @@ This confirms that the agent produced a valid preds.json, SWE-bench evaluation r
 
 Runtime artifacts are written to:
 
-runs/<run_id>/
+runs/RUN_ID/
 
 Example structure:
 
@@ -157,12 +157,12 @@ runs/batch_phase1_003/
     trajectories/
       preds.json
       minisweagent.log
-      <instance trajectory>
+      instance_trajectory
   run-eval/
     eval.log
     status.json
     reports/
-      <swebench report>.json
+      swebench_report.json
 
 The runs/ directory is ignored by Git because it contains runtime artifacts.
 
@@ -226,7 +226,7 @@ The DAG uses uv run for agent and evaluation execution so both steps run in the 
 
 DockerOperator was not implemented in this iteration, but the pipeline is structured so the agent and evaluation steps can later be moved into DockerOperator or KubernetesPodOperator.
 
-Remote object storage was not implemented in this iteration. Instead, the DAG writes a clear local runs/<run_id>/ folder and a sanitized sample is committed for reproducibility evidence.
+Remote object storage was not implemented in this iteration. Instead, the DAG writes a clear local runs/RUN_ID/ folder and a sanitized sample is committed for reproducibility evidence.
 
 ## Submission Checklist
 
@@ -238,7 +238,7 @@ This repository includes the minimum working submission requested in the assignm
 - Additional useful params: `model`, `task_slice`, `run_id`, `cost_limit`
 - Agent execution: `uv run mini-extra swebench`
 - Evaluation execution: `uv run python -m swebench.harness.run_evaluation`
-- Runtime artifact layout: `runs/<run_id>/`
+- Runtime artifact layout: `runs/RUN_ID/`
 - Sanitized evidence sample: `sample/evaluate_agent_batch_phase1_003/`
 - MLflow logging: params, metrics, run ID, and artifact path
 - Completed evaluation evidence: `eval_succeeded = 1`
@@ -321,9 +321,9 @@ The assignment notes that a production-style solution can improve the pipeline w
 Those additions were not implemented in this iteration. The current implementation still keeps the run reproducible by:
 
 - running agent and evaluation through the project `uv` environment
-- writing all runtime evidence under `runs/<run_id>/`
+- writing all runtime evidence under `runs/RUN_ID/`
 - logging run parameters and metrics to MLflow
 - committing a sanitized sample run for review
 - ignoring local runtime artifacts and local MLflow databases in Git
 
-The next production step would be to move `run_agent` and `run_eval` from local subprocess calls into DockerOperator tasks using the provided Dockerfile, then upload `runs/<run_id>/` to S3/Object Storage and log the remote URI to MLflow.
+The next production step would be to move `run_agent` and `run_eval` from local subprocess calls into DockerOperator tasks using the provided Dockerfile, then upload `runs/RUN_ID/` to S3/Object Storage and log the remote URI to MLflow.
