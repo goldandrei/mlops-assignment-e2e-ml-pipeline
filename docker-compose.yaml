@@ -1,0 +1,53 @@
+services:
+  mlflow:
+    image: python:3.12-slim
+    container_name: mlops-mlflow
+    working_dir: /mlflow
+    command: >
+      sh -lc "
+      pip install --no-cache-dir mlflow &&
+      mlflow server
+        --backend-store-uri sqlite:////mlflow/mlflow.db
+        --default-artifact-root /mlflow/artifacts
+        --host 0.0.0.0
+        --port 5000
+      "
+    ports:
+      - "5000:5000"
+    volumes:
+      - mlflow_data:/mlflow
+
+  airflow:
+    image: python:3.12-slim
+    container_name: mlops-airflow
+    working_dir: /project
+    depends_on:
+      - mlflow
+    env_file:
+      - .env
+    environment:
+      AIRFLOW_HOME: /airflow
+      AIRFLOW__CORE__DAGS_FOLDER: /project/dags
+      AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+      MLFLOW_TRACKING_URI: http://mlflow:5000
+      DOCKER_HOST: unix:///var/run/docker.sock
+    ports:
+      - "8080:8080"
+    volumes:
+      - .:/project
+      - airflow_home:/airflow
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: >
+      sh -lc "
+      apt-get update &&
+      apt-get install -y curl ca-certificates docker.io &&
+      curl -LsSf https://astral.sh/uv/install.sh | sh &&
+      export PATH=/root/.local/bin:$PATH &&
+      uv sync &&
+      echo '{\"admin\": \"admin\"}' > /airflow/simple_auth_manager_passwords.json.generated &&
+      uv tool run --with mlflow apache-airflow standalone
+      "
+
+volumes:
+  airflow_home:
+  mlflow_data:

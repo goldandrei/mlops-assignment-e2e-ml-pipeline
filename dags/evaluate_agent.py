@@ -71,7 +71,7 @@ def cleanup_minisweagent_containers() -> list[str]:
 
 def log_mlflow_run(config: dict, metrics: dict, run_dir: Path) -> dict:
     params = config["params"]
-    tracking_uri = params.get("mlflow_tracking_uri") or f"sqlite:///{PROJECT_ROOT / 'mlflow.db'}"
+    tracking_uri = params.get("mlflow_tracking_uri") or os.environ.get("MLFLOW_TRACKING_URI") or f"sqlite:///{PROJECT_ROOT / 'mlflow.db'}"
     experiment_name = params.get("mlflow_experiment_name") or "coding-agent-evaluation"
 
     try:

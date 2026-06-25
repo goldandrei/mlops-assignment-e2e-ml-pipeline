@@ -327,3 +327,33 @@ Those additions were not implemented in this iteration. The current implementati
 - ignoring local runtime artifacts and local MLflow databases in Git
 
 The next production step would be to move `run_agent` and `run_eval` from local subprocess calls into DockerOperator tasks using the provided Dockerfile, then upload `runs/RUN_ID/` to S3/Object Storage and log the remote URI to MLflow.
+
+## Docker Compose Deployment
+
+A production-style addition is provided through:
+
+docker-compose.yaml
+
+It starts two services:
+
+- `airflow`: standalone Airflow service on port 8080
+- `mlflow`: MLflow tracking server on port 5000
+
+The Airflow service mounts the project directory, uses the project DAGs, loads `.env`, and forwards the Docker socket so SWE-bench evaluation containers can be created by the harness.
+
+To start the compose stack:
+
+docker compose up --build
+
+Then open:
+
+Airflow: http://localhost:8080
+MLflow: http://localhost:5000
+
+In compose mode, the DAG can log to MLflow through:
+
+MLFLOW_TRACKING_URI=http://mlflow:5000
+
+The local standalone path is still supported through:
+
+bash run-airflow-standalone.sh
