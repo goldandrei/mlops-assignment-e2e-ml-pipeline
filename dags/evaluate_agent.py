@@ -119,7 +119,7 @@ def log_mlflow_run(config: dict, metrics: dict, run_dir: Path) -> dict:
     catchup=False,
     params={
         "run_id": Param("", type="string"),
-        "mode": Param("single", enum=["single", "batch"]),
+        "mode": Param("batch", enum=["batch"], description="Batch evaluation mode. Produces preds.json and runs SWE-bench evaluation."),
         "subset": Param("verified", type="string"),
         "split": Param("test", type="string"),
         "model": Param("nebius/moonshotai/Kimi-K2.6", type="string"),
@@ -168,30 +168,23 @@ def evaluate_agent_dag():
             "MSWEA_COST_TRACKING": "ignore_errors",
         }
 
-        if params["mode"] == "single":
-            output_path = agent_dir / "trajectory.json"
-            command = [
-                "uv", "run", "mini-extra", "swebench-single",
-                "--subset", params["subset"],
-                "--split", params["split"],
-                "--model", params["model"],
-                "--yolo",
-                "--cost-limit", str(params["cost_limit"]),
-                "-i", params["instance_id"],
-                "-o", str(output_path),
-            ]
-        else:
-            output_path = agent_dir / "trajectories"
-            command = [
-                "uv", "run", "mini-extra", "swebench",
-                "--subset", params["subset"],
-                "--split", params["split"],
-                "--model", params["model"],
-                "--slice", params["task_slice"],
-                "--config", "swebench.yaml",
-                "--workers", str(params["workers"]),
-                "-o", str(output_path),
-            ]
+        if params.get("mode") != "batch":
+            raise ValueError(
+                "Only batch mode is supported for evaluated runs. "
+                "Batch mode produces trajectories/preds.json required by SWE-bench evaluation."
+            )
+
+        output_path = agent_dir / "trajectories"
+        command = [
+            "uv", "run", "mini-extra", "swebench",
+            "--subset", params["subset"],
+            "--split", params["split"],
+            "--model", params["model"],
+            "--slice", params["task_slice"],
+            "--config", "swebench.yaml",
+            "--workers", str(params["workers"]),
+            "-o", str(output_path),
+        ]
 
         timeout_seconds = int(params.get("agent_timeout_seconds", 900))
         return_code = run_command(command, PROJECT_ROOT, env, log_path, timeout_seconds)

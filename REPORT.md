@@ -36,12 +36,11 @@ The config stores the run ID, project root, timestamp, and Airflow parameters.
 
 Runs mini-swe-agent through uv run.
 
-The DAG supports two modes:
+The evaluated submission uses batch mode.
 
-single
 batch
 
-For the completed evaluation run, batch mode was used.
+Batch mode is the supported evaluation path because it produces trajectories/preds.json, which is required by SWE-bench evaluation.
 
 The agent writes artifacts under:
 
@@ -357,3 +356,14 @@ MLFLOW_TRACKING_URI=http://mlflow:5000
 The local standalone path is still supported through:
 
 bash run-airflow-standalone.sh
+
+
+## Evaluation Mode Decision
+
+The graded evaluation path uses batch mode only.
+
+Single-instance ad-hoc agent execution can be useful for local debugging, but the SWE-bench evaluation step expects a predictions file at:
+
+runs/RUN_ID/run-agent/trajectories/preds.json
+
+Batch mode produces this file directly, so the Airflow DAG restricts the submitted evaluation flow to batch mode. This avoids a misleading configuration where the agent runs but evaluation is skipped because preds.json does not exist.
