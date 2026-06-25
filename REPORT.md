@@ -227,3 +227,103 @@ The DAG uses uv run for agent and evaluation execution so both steps run in the 
 DockerOperator was not implemented in this iteration, but the pipeline is structured so the agent and evaluation steps can later be moved into DockerOperator or KubernetesPodOperator.
 
 Remote object storage was not implemented in this iteration. Instead, the DAG writes a clear local runs/<run_id>/ folder and a sanitized sample is committed for reproducibility evidence.
+
+## Submission Checklist
+
+This repository includes the minimum working submission requested in the assignment.
+
+- Configurable Airflow DAG: `dags/evaluate_agent.py`
+- DAG tasks: `prepare_run`, `run_agent`, `run_eval`, `summarize_and_log`
+- Required Airflow params: `split`, `subset`, `workers`
+- Additional useful params: `model`, `task_slice`, `run_id`, `cost_limit`
+- Agent execution: `uv run mini-extra swebench`
+- Evaluation execution: `uv run python -m swebench.harness.run_evaluation`
+- Runtime artifact layout: `runs/<run_id>/`
+- Sanitized evidence sample: `sample/evaluate_agent_batch_phase1_003/`
+- MLflow logging: params, metrics, run ID, and artifact path
+- Completed evaluation evidence: `eval_succeeded = 1`
+
+## Evidence Files Committed
+
+The full `runs/` directory is intentionally ignored because it contains runtime artifacts.
+
+Instead, the repository includes this small sanitized sample:
+
+sample/evaluate_agent_batch_phase1_003/
+
+Important files:
+
+- `config.json`: run configuration and parameters
+- `agent_status.json`: agent command, output path, and return code
+- `eval_status.json`: SWE-bench evaluation command and return code
+- `metrics.json`: final pipeline metrics
+- `mlflow.json`: MLflow tracking evidence
+- `preds.json`: model patch submitted to SWE-bench
+- `swebench_report.json`: SWE-bench evaluation report
+- `manifest.json`: important artifact references
+
+## Completed Run Evidence
+
+The completed run was:
+
+batch_phase1_003
+
+Final metrics:
+
+agent_succeeded = 1
+eval_skipped = 0
+eval_succeeded = 1
+mlflow_logged = 1
+
+SWE-bench completed one submitted instance successfully:
+
+Instances submitted: 1
+Instances completed: 1
+Instances resolved: 1
+Instances with errors: 0
+
+## Rerun Instructions
+
+To rerun the same pipeline with a new run ID:
+
+1. Start Airflow:
+
+source .venv/bin/activate
+set -a
+source .env
+set +a
+bash run-airflow-standalone.sh
+
+2. Open Airflow on port 8080.
+
+3. Trigger the `evaluate_agent` DAG.
+
+4. Use similar parameters, but change `run_id` to a new value, for example:
+
+batch_rerun_001
+
+5. After completion, inspect:
+
+runs/batch_rerun_001/config.json
+runs/batch_rerun_001/run-agent/status.json
+runs/batch_rerun_001/run-agent/trajectories/preds.json
+runs/batch_rerun_001/run-eval/status.json
+runs/batch_rerun_001/metrics.json
+runs/batch_rerun_001/manifest.json
+runs/batch_rerun_001/mlflow.json
+
+## Production Follow-up
+
+This submission follows the standalone Airflow speedrun path.
+
+The assignment notes that a production-style solution can improve the pipeline with DockerOperator, docker-compose deployment, and remote Object Storage.
+
+Those additions were not implemented in this iteration. The current implementation still keeps the run reproducible by:
+
+- running agent and evaluation through the project `uv` environment
+- writing all runtime evidence under `runs/<run_id>/`
+- logging run parameters and metrics to MLflow
+- committing a sanitized sample run for review
+- ignoring local runtime artifacts and local MLflow databases in Git
+
+The next production step would be to move `run_agent` and `run_eval` from local subprocess calls into DockerOperator tasks using the provided Dockerfile, then upload `runs/<run_id>/` to S3/Object Storage and log the remote URI to MLflow.
