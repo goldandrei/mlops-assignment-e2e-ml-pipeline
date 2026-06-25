@@ -15,8 +15,9 @@ RUN curl -LsSf https://astral.sh/uv/install.sh | sh
 
 WORKDIR /project
 
-COPY pyproject.toml uv.lock* ./
-
+COPY pyproject.toml uv.lock ./
 RUN uv sync
+
+COPY . .
 
 CMD ["sh", "-lc", "echo '{\"admin\": \"admin\"}' > /airflow/simple_auth_manager_passwords.json.generated && uv tool run --with mlflow apache-airflow standalone"]

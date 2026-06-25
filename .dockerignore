@@ -1,0 +1,13 @@
+.git
+.venv
+__pycache__
+.ruff_cache
+.env
+runs
+mlruns
+mlartifacts
+mlflow.db
+mlflow.db-shm
+mlflow.db-wal
+SWE-bench
+mini-swe-agent

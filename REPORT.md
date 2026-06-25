@@ -382,3 +382,22 @@ The Airflow service now builds a reusable image with:
 - Docker CLI for SWE-bench harness container execution
 
 This makes the compose setup faster and more reproducible than installing dependencies at container startup.
+
+## Compose Image Wiring
+
+The Airflow compose service is wired to the reusable Airflow image through:
+
+airflow:
+  build:
+    context: .
+    dockerfile: Dockerfile.airflow
+
+This means the Airflow container no longer installs curl, Docker CLI, uv, and project dependencies on every startup.
+
+The image build happens once through Docker Compose, and startup uses the `CMD` defined in `Dockerfile.airflow`.
+
+The compose file still mounts:
+
+- `./runs:/project/runs` for runtime artifacts
+- `/var/run/docker.sock:/var/run/docker.sock` so the SWE-bench harness can create evaluation containers
+- `airflow_home:/airflow` for persistent Airflow state

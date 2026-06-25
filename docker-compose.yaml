@@ -18,7 +18,9 @@ services:
       - mlflow_data:/mlflow
 
   airflow:
-    image: python:3.12-slim
+    build:
+      context: .
+      dockerfile: Dockerfile.airflow
     container_name: mlops-airflow
     working_dir: /project
     depends_on:
@@ -34,19 +36,9 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - .:/project
       - airflow_home:/airflow
+      - ./runs:/project/runs
       - /var/run/docker.sock:/var/run/docker.sock
-    command: >
-      sh -lc "
-      apt-get update &&
-      apt-get install -y curl ca-certificates docker.io &&
-      curl -LsSf https://astral.sh/uv/install.sh | sh &&
-      export PATH=/root/.local/bin:$PATH &&
-      uv sync &&
-      echo '{\"admin\": \"admin\"}' > /airflow/simple_auth_manager_passwords.json.generated &&
-      uv tool run --with mlflow apache-airflow standalone
-      "
 
 volumes:
   airflow_home:
