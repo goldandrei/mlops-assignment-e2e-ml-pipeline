@@ -18,6 +18,113 @@ def write_json(path: Path, data: dict) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(data, indent=2, sort_keys=True), encoding="utf-8")
 
+def _count_report_value(value):
+    """Convert SWE-bench report values into numeric MLflow-friendly metrics."""
+    if value is None:
+        return None
+    if isinstance(value, bool):
+        return int(value)
+    if isinstance(value, int):
+        return value
+    if isinstance(value, float):
+        return value
+    if isinstance(value, (list, tuple, set)):
+        return len(value)
+    if isinstance(value, dict):
+        return len(value)
+    return None
+
+
+def extract_swebench_metrics(run_dir: Path) -> dict:
+    """Extract useful numeric metrics from the SWE-bench JSON report.
+
+    The exact report schema may vary across SWE-bench versions, so this parser
+    accepts several common key names and converts lists/dicts to counts.
+    """
+    reports_dir = run_dir / "run-eval" / "reports"
+    reports = sorted(reports_dir.glob("*.json"))
+
+    metrics = {
+        "swebench_report_found": int(bool(reports)),
+    }
+
+    if not reports:
+        return metrics
+
+    try:
+        report = json.loads(reports[0].read_text(encoding="utf-8"))
+    except Exception:
+        metrics["swebench_report_parse_error"] = 1
+        return metrics
+
+    metrics["swebench_report_parse_error"] = 0
+
+    key_groups = {
+        "swebench_total_instances": [
+            "total_instances",
+            "total",
+        ],
+        "swebench_submitted_instances": [
+            "submitted_instances",
+            "instances_submitted",
+            "submitted_ids",
+        ],
+        "swebench_completed_instances": [
+            "completed_instances",
+            "instances_completed",
+            "completed_ids",
+        ],
+        "swebench_resolved_instances": [
+            "resolved_instances",
+            "instances_resolved",
+            "resolved_ids",
+        ],
+        "swebench_unresolved_instances": [
+            "unresolved_instances",
+            "instances_unresolved",
+            "unresolved_ids",
+        ],
+        "swebench_empty_patch_instances": [
+            "empty_patch_instances",
+            "instances_with_empty_patches",
+            "empty_patch_ids",
+        ],
+        "swebench_error_instances": [
+            "error_instances",
+            "instances_with_errors",
+            "error_ids",
+        ],
+    }
+
+    for metric_name, possible_keys in key_groups.items():
+        for key in possible_keys:
+            if key in report:
+                value = _count_report_value(report.get(key))
+                if value is not None:
+                    metrics[metric_name] = value
+                    break
+
+    # Some SWE-bench versions store report fields under a nested summary key.
+    summary = report.get("summary") if isinstance(report, dict) else None
+    if isinstance(summary, dict):
+        for metric_name, possible_keys in key_groups.items():
+            if metric_name in metrics:
+                continue
+            for key in possible_keys:
+                if key in summary:
+                    value = _count_report_value(summary.get(key))
+                    if value is not None:
+                        metrics[metric_name] = value
+                        break
+
+    submitted = metrics.get("swebench_submitted_instances")
+    resolved = metrics.get("swebench_resolved_instances")
+    if submitted:
+        metrics["swebench_resolve_rate"] = float(resolved or 0) / float(submitted)
+
+    return metrics
+
+
 
 def run_command(command: list[str], cwd: Path, env: dict, log_path: Path, timeout_seconds: int) -> int:
     log_path.parent.mkdir(parents=True, exist_ok=True)
@@ -286,6 +393,7 @@ def evaluate_agent_dag():
             "eval_succeeded": int(eval_status.get("succeeded", False)),
             "eval_skipped": int(eval_status.get("skipped", False)),
         }
+        metrics.update(extract_swebench_metrics(run_dir))
 
         write_json(run_dir / "metrics.json", metrics)
 

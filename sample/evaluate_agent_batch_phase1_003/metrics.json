@@ -3,5 +3,15 @@
   "artifact_count": 12,
   "eval_skipped": 0,
   "eval_succeeded": 1,
-  "mlflow_logged": 1
+  "mlflow_logged": 1,
+  "swebench_completed_instances": 1,
+  "swebench_empty_patch_instances": 0,
+  "swebench_error_instances": 0,
+  "swebench_report_found": 1,
+  "swebench_report_parse_error": 0,
+  "swebench_resolve_rate": 1.0,
+  "swebench_resolved_instances": 1,
+  "swebench_submitted_instances": 1,
+  "swebench_total_instances": 500,
+  "swebench_unresolved_instances": 0
 }

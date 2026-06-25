@@ -401,3 +401,25 @@ The compose file still mounts:
 - `./runs:/project/runs` for runtime artifacts
 - `/var/run/docker.sock:/var/run/docker.sock` so the SWE-bench harness can create evaluation containers
 - `airflow_home:/airflow` for persistent Airflow state
+
+## SWE-bench Metrics Logged to MLflow
+
+The DAG parses the SWE-bench JSON report produced under:
+
+runs/RUN_ID/run-eval/reports/
+
+and extracts numeric evaluation metrics into `metrics.json`.
+
+Examples of metrics extracted when present:
+
+- `swebench_report_found`
+- `swebench_total_instances`
+- `swebench_submitted_instances`
+- `swebench_completed_instances`
+- `swebench_resolved_instances`
+- `swebench_unresolved_instances`
+- `swebench_empty_patch_instances`
+- `swebench_error_instances`
+- `swebench_resolve_rate`
+
+These metrics are passed through the existing MLflow logging path, so evaluation quality is visible in MLflow instead of only in the raw SWE-bench report.

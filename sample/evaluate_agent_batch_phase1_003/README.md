@@ -16,3 +16,5 @@ Key result:
 
 The full runtime folder is intentionally not committed because /runs/ is ignored.
 This sample keeps only small metadata and evidence files required to understand the run.
+
+Additional SWE-bench report metrics are extracted from `swebench_report.json` and included in `metrics.json`, so the DAG can log evaluation-level metrics such as resolved instances and resolve rate to MLflow on future runs.
