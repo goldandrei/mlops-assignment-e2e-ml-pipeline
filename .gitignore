@@ -10,3 +10,9 @@ __pycache__
 
 mini-swe-agent/
 SWE-bench/
+/runs/
+/mlruns/
+/mlflow.db
+/mlflow.db-shm
+/mlflow.db-wal
+/mlartifacts/

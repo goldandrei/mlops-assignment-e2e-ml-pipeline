@@ -1,0 +1,83 @@
+{
+  "agent_status": {
+    "cleaned_containers": [],
+    "command": [
+      "uv",
+      "run",
+      "mini-extra",
+      "swebench",
+      "--subset",
+      "verified",
+      "--split",
+      "test",
+      "--model",
+      "nebius/moonshotai/Kimi-K2.6",
+      "--slice",
+      "0:1",
+      "--config",
+      "swebench.yaml",
+      "--workers",
+      "1",
+      "-o",
+      "<PROJECT_ROOT>/runs/batch_phase1_003/run-agent/trajectories"
+    ],
+    "log_path": "<PROJECT_ROOT>/runs/batch_phase1_003/run-agent/agent.log",
+    "mode": "batch",
+    "output_path": "<PROJECT_ROOT>/runs/batch_phase1_003/run-agent/trajectories",
+    "return_code": 0,
+    "step": "run_agent",
+    "succeeded": true,
+    "timed_out": false,
+    "timeout_seconds": 900
+  },
+  "artifacts": [
+    "config.json",
+    "manifest.json",
+    "metrics.json",
+    "mlflow.json",
+    "run-agent/agent.log",
+    "run-agent/status.json",
+    "run-agent/trajectories/astropy__astropy-12907/astropy__astropy-12907.traj.json",
+    "run-agent/trajectories/exit_statuses_1782381102.9493537.yaml",
+    "run-agent/trajectories/minisweagent.log",
+    "run-agent/trajectories/preds.json",
+    "run-eval/eval.log",
+    "run-eval/status.json"
+  ],
+  "created_at_utc": "2026-06-25T09:55:45.075060",
+  "eval_status": {
+    "command": [
+      "uv",
+      "run",
+      "python",
+      "-m",
+      "swebench.harness.run_evaluation",
+      "--dataset_name",
+      "princeton-nlp/SWE-bench_Verified",
+      "--split",
+      "test",
+      "--predictions_path",
+      "<PROJECT_ROOT>/runs/batch_phase1_003/run-agent/trajectories/preds.json",
+      "--max_workers",
+      "1",
+      "--run_id",
+      "batch_phase1_003",
+      "--report_dir",
+      "<PROJECT_ROOT>/runs/batch_phase1_003/run-eval/reports"
+    ],
+    "log_path": "<PROJECT_ROOT>/runs/batch_phase1_003/run-eval/eval.log",
+    "preds_path": "<PROJECT_ROOT>/runs/batch_phase1_003/run-agent/trajectories/preds.json",
+    "return_code": 0,
+    "skipped": false,
+    "step": "run_eval",
+    "succeeded": true
+  },
+  "mlflow_status": {
+    "artifact_path": "<PROJECT_ROOT>/runs/batch_phase1_003",
+    "experiment_name": "coding-agent-evaluation",
+    "mlflow_run_id": "8782970d3ff3493a8f4764f2ce68135e",
+    "succeeded": true,
+    "tracking_uri": "sqlite:///<PROJECT_ROOT>/mlflow.db"
+  },
+  "run_dir": "<PROJECT_ROOT>/runs/batch_phase1_003"
+}

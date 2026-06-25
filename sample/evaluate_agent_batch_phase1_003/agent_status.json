@@ -1,0 +1,31 @@
+{
+  "cleaned_containers": [],
+  "command": [
+    "uv",
+    "run",
+    "mini-extra",
+    "swebench",
+    "--subset",
+    "verified",
+    "--split",
+    "test",
+    "--model",
+    "nebius/moonshotai/Kimi-K2.6",
+    "--slice",
+    "0:1",
+    "--config",
+    "swebench.yaml",
+    "--workers",
+    "1",
+    "-o",
+    "<PROJECT_ROOT>/runs/batch_phase1_003/run-agent/trajectories"
+  ],
+  "log_path": "<PROJECT_ROOT>/runs/batch_phase1_003/run-agent/agent.log",
+  "mode": "batch",
+  "output_path": "<PROJECT_ROOT>/runs/batch_phase1_003/run-agent/trajectories",
+  "return_code": 0,
+  "step": "run_agent",
+  "succeeded": true,
+  "timed_out": false,
+  "timeout_seconds": 900
+}

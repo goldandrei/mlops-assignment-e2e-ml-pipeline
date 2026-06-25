@@ -1,0 +1,27 @@
+{
+  "command": [
+    "uv",
+    "run",
+    "python",
+    "-m",
+    "swebench.harness.run_evaluation",
+    "--dataset_name",
+    "princeton-nlp/SWE-bench_Verified",
+    "--split",
+    "test",
+    "--predictions_path",
+    "<PROJECT_ROOT>/runs/batch_phase1_003/run-agent/trajectories/preds.json",
+    "--max_workers",
+    "1",
+    "--run_id",
+    "batch_phase1_003",
+    "--report_dir",
+    "<PROJECT_ROOT>/runs/batch_phase1_003/run-eval/reports"
+  ],
+  "log_path": "<PROJECT_ROOT>/runs/batch_phase1_003/run-eval/eval.log",
+  "preds_path": "<PROJECT_ROOT>/runs/batch_phase1_003/run-agent/trajectories/preds.json",
+  "return_code": 0,
+  "skipped": false,
+  "step": "run_eval",
+  "succeeded": true
+}

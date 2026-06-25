@@ -1,0 +1,7 @@
+{
+  "artifact_path": "<PROJECT_ROOT>/runs/batch_phase1_003",
+  "experiment_name": "coding-agent-evaluation",
+  "mlflow_run_id": "8782970d3ff3493a8f4764f2ce68135e",
+  "succeeded": true,
+  "tracking_uri": "sqlite:///<PROJECT_ROOT>/mlflow.db"
+}
